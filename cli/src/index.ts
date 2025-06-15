@@ -89,10 +89,12 @@ function createTransportOptions(
 async function callMethod(args: Args): Promise<void> {
   const transportOptions = createTransportOptions(args.target, args.transport);
   const transport = createTransport(transportOptions);
-  const client = new Client({
-    name: "inspector-cli",
-    version: packageJson.version,
-  });
+
+  const [_, name = packageJson.name] = packageJson.name.split("/");
+  const version = packageJson.version;
+  const clientIdentity = { name, version };
+
+  const client = new Client(clientIdentity);
 
   try {
     await connect(client, transport);
