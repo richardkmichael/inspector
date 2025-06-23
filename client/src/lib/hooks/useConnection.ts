@@ -462,6 +462,50 @@ export function useConnection({
                 transportOptions,
               );
 
+        // Minimal intervention: Log outgoing requests at transport level
+        const originalSend = transport.send.bind(transport);
+        transport.send = async (message: any, options?: any) => {
+          console.log("🚀 OUTGOING JSON-RPC:", JSON.stringify(message, null, 2));
+          return originalSend(message, options);
+        };
+
+        /**
+         * MESSAGE FLOW MYSTERY: We patch Protocol._onresponse() instead of Transport.onmessage 
+         * because initialize responses were not captured by Transport.onmessage wrappers.
+         * 
+         * Normal message flow: Transport.onmessage → Protocol.onmessage → Protocol._onresponse
+         * - Transport.onmessage wrapper successfully captures: tools/list, prompts/get, etc. responses
+         * - Transport.onmessage wrapper fails to capture: initialize response only
+         * - Protocol._onresponse wrapper captures: ALL responses including initialize
+         * 
+         * We confirmed the initialize response exists and flows through the proxy server logs.
+         * Client.connect() calls Protocol.connect() which sets Transport.onmessage, then calls
+         * this.request() for initialize, which should follow normal response handling.
+         * 
+         * Potential explanations:
+         * 1. Race condition: Initialize response arrives before Transport.onmessage wrapper installed
+         * 2. SSE transport: Initialize response in HTTP body vs subsequent responses via EventSource
+         * 3. SDK synchronous handling: Initialize uses different code path than regular requests
+         * 
+         * TODO: Investigate why Transport.onmessage misses only initialize responses
+         */
+        const originalOnResponse = Object.getPrototypeOf(client)._onresponse.bind(client);
+        Object.getPrototypeOf(client)._onresponse = function(response: any) {
+          console.log("📨 INCOMING JSON-RPC RESPONSE:", JSON.stringify(response, null, 2));
+          return originalOnResponse(response);
+        };
+
+        /**
+         * We patch Protocol._onnotification() for consistency with Protocol._onresponse() approach
+         * and to minimize the number of different patching strategies. The Transport.onmessage 
+         * wrapper did successfully capture notifications, so we could have used that instead.
+         */
+        const originalOnNotification = Object.getPrototypeOf(client)._onnotification.bind(client);
+        Object.getPrototypeOf(client)._onnotification = function(notification: any) {
+          console.log("📨 INCOMING JSON-RPC NOTIFICATION:", JSON.stringify(notification, null, 2));
+          return originalOnNotification(notification);
+        };
+
         await client.connect(transport as Transport);
 
         setClientTransport(transport);
