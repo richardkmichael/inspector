@@ -141,7 +141,7 @@ const PromptsTab = ({
                       onInputChange={(value) =>
                         handleInputChange(arg.name, value)
                       }
-                      options={completions[arg.name] || []}
+                      options={completions[arg.name]}
                     />
 
                     {arg.description && (

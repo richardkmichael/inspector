@@ -19,7 +19,7 @@ interface ComboboxProps {
   value: string;
   onChange: (value: string) => void;
   onInputChange: (value: string) => void;
-  options: string[];
+  options: string[] | null;
   placeholder?: string;
   emptyMessage?: string;
   id?: string;
@@ -29,7 +29,7 @@ export function Combobox({
   value,
   onChange,
   onInputChange,
-  options = [],
+  options = null,
   placeholder = "Select...",
   emptyMessage = "No results found.",
   id,
@@ -72,24 +72,28 @@ export function Combobox({
             value={value}
             onValueChange={handleInputChange}
           />
-          <CommandEmpty>{emptyMessage}</CommandEmpty>
-          <CommandGroup>
-            {options.map((option) => (
-              <CommandItem
-                key={option}
-                value={option}
-                onSelect={() => handleSelect(option)}
-              >
-                <Check
-                  className={cn(
-                    "mr-2 h-4 w-4",
-                    value === option ? "opacity-100" : "opacity-0",
-                  )}
-                />
-                {option}
-              </CommandItem>
-            ))}
-          </CommandGroup>
+          {options && (
+            <>
+              <CommandEmpty>{emptyMessage}</CommandEmpty>
+              <CommandGroup>
+                {options.map((option) => (
+                  <CommandItem
+                    key={option}
+                    value={option}
+                    onSelect={() => handleSelect(option)}
+                  >
+                    <Check
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        value === option ? "opacity-100" : "opacity-0",
+                      )}
+                    />
+                    {option}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </>
+          )}
         </Command>
       </PopoverContent>
     </Popover>
