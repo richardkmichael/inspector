@@ -57,7 +57,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.52.0",
-    "@types/jest": "^29.5.14",
+    "@types/jest": "^30.0.0",
     "@types/node": "^22.7.5",
     "@types/shell-quote": "^1.7.5",
     "jest-fixed-jsdom": "^0.0.9",
