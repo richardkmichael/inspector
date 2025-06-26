@@ -5,6 +5,9 @@ module.exports = {
     "^@/(.*)$": "<rootDir>/src/$1",
     "\\.css$": "<rootDir>/src/__mocks__/styleMock.js",
   },
+
+  // Use ts-jest to transform TypeScript so that type verification is performedc during testing. The
+  // default TypeScript transformer, `babel-jest`, does not do this.
   transform: {
     "^.+\\.tsx?$": [
       "ts-jest",
@@ -14,6 +17,7 @@ module.exports = {
       },
     ],
   },
+
   extensionsToTreatAsEsm: [".ts", ".tsx"],
   testRegex: "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
   // Exclude directories and files that don't need to be tested
