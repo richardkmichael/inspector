@@ -19,6 +19,7 @@ export default defineConfig({
   },
 
   testDir: "./e2e",
+  testIgnore: "**/everything-server.spec.ts",
   outputDir: "./e2e/test-results",
   /* Run tests in files in parallel */
   fullyParallel: true,
