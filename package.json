@@ -35,6 +35,7 @@
     "test": "npm run prettier-check && cd client && npm test",
     "test-cli": "cd cli && npm run test",
     "test:e2e": "npm run test:e2e --workspace=client",
+    "test:e2e:everything": "npm run test:e2e:everything --workspace=client",
     "prettier-fix": "prettier --write .",
     "prettier-check": "prettier --check .",
     "lint": "prettier --check . && cd client && npm run lint",
