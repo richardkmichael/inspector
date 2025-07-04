@@ -1,5 +1,10 @@
 # MCP Inspector Development Guide
 
+## Overview
+
+- Inspector is an app for working with MCP Servers: React frontend, Express backend, and CLI
+- MCP is the Model Context Protocol, specification: https://modelcontextprotocol.io/specification/latest
+
 ## Build Commands
 
 - Build all: `npm run build`
