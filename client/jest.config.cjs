@@ -23,6 +23,7 @@ module.exports = {
     "/bin/",
     "/e2e/",
     "\\.config\\.(js|ts|cjs|mjs)$",
+    "/helpers/",
   ],
   // Exclude the same patterns from coverage reports
   coveragePathIgnorePatterns: [
@@ -31,5 +32,6 @@ module.exports = {
     "/bin/",
     "/e2e/",
     "\\.config\\.(js|ts|cjs|mjs)$",
+    "/helpers/",
   ],
 };

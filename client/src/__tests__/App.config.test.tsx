@@ -1,82 +1,13 @@
 import { render, waitFor } from "@testing-library/react";
+import { DEFAULT_INSPECTOR_CONFIG } from "./helpers/app-mocks";
 import App from "../App";
-import { DEFAULT_INSPECTOR_CONFIG } from "../lib/constants";
 import { InspectorConfig } from "../lib/configurationTypes";
 import * as configUtils from "../utils/configUtils";
-
-// Mock auth dependencies first
-jest.mock("@modelcontextprotocol/sdk/client/auth.js", () => ({
-  auth: jest.fn(),
-}));
-
-jest.mock("../lib/oauth-state-machine", () => ({
-  OAuthStateMachine: jest.fn(),
-}));
-
-jest.mock("../lib/auth", () => ({
-  InspectorOAuthClientProvider: jest.fn().mockImplementation(() => ({
-    tokens: jest.fn().mockResolvedValue(null),
-    clear: jest.fn(),
-  })),
-  DebugInspectorOAuthClientProvider: jest.fn(),
-}));
-
-// Mock the config utils
-jest.mock("../utils/configUtils", () => ({
-  ...jest.requireActual("../utils/configUtils"),
-  getMCPProxyAddress: jest.fn(() => "http://localhost:6277"),
-  getMCPProxyAuthToken: jest.fn((config: InspectorConfig) => ({
-    token: config.MCP_PROXY_AUTH_TOKEN.value,
-    header: "X-MCP-Proxy-Auth",
-  })),
-  getInitialTransportType: jest.fn(() => "stdio"),
-  getInitialSseUrl: jest.fn(() => "http://localhost:3001/sse"),
-  getInitialCommand: jest.fn(() => "mcp-server-everything"),
-  getInitialArgs: jest.fn(() => ""),
-  initializeInspectorConfig: jest.fn(() => DEFAULT_INSPECTOR_CONFIG),
-  saveInspectorConfig: jest.fn(),
-}));
 
 // Get references to the mocked functions
 const mockGetMCPProxyAuthToken = configUtils.getMCPProxyAuthToken as jest.Mock;
 const mockInitializeInspectorConfig =
   configUtils.initializeInspectorConfig as jest.Mock;
-
-// Mock other dependencies
-jest.mock("../lib/hooks/useConnection", () => ({
-  useConnection: () => ({
-    connectionStatus: "disconnected",
-    serverCapabilities: null,
-    mcpClient: null,
-    requestHistory: [],
-    makeRequest: jest.fn(),
-    sendNotification: jest.fn(),
-    handleCompletion: jest.fn(),
-    completionsSupported: false,
-    connect: jest.fn(),
-    disconnect: jest.fn(),
-  }),
-}));
-
-jest.mock("../lib/hooks/useDraggablePane", () => ({
-  useDraggablePane: () => ({
-    height: 300,
-    handleDragStart: jest.fn(),
-  }),
-  useDraggableSidebar: () => ({
-    width: 320,
-    isDragging: false,
-    handleDragStart: jest.fn(),
-  }),
-}));
-
-jest.mock("../components/Sidebar", () => ({
-  __esModule: true,
-  default: () => <div>Sidebar</div>,
-}));
-
-// Mock fetch
-global.fetch = jest.fn();
 
 describe("App - Config Endpoint", () => {
   beforeEach(() => {
