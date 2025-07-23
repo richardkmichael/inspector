@@ -1,5 +1,18 @@
 import { defineConfig, devices } from "@playwright/test";
 
+const getWebServerCommand = () => {
+  switch (process.env.CLI_TEST_SCENARIO) {
+    case "inline":
+      return "npx . -e FOO=bar uv run main.py";
+    case "file":
+      return "npx . --config client/e2e/test-config.json --server test-server";
+    case "none":
+      return "npx . "; // FIXME: With and without a mock localStorage
+    default:
+      return "npm run dev";
+  }
+};
+
 /**
  * @see https://playwright.dev/docs/test-configuration
  */
@@ -7,9 +20,13 @@ export default defineConfig({
   /* Run your local dev server before starting the tests */
   webServer: {
     cwd: "..",
-    command: "npm run dev",
+    command: getWebServerCommand(),
     url: "http://localhost:6274",
     reuseExistingServer: !process.env.CI,
+    env: {
+      MCP_AUTO_OPEN_ENABLED: "false",
+      DANGEROUSLY_OMIT_AUTH: "true"
+    },
   },
 
   testDir: "./e2e",
