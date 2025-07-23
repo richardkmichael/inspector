@@ -67,7 +67,25 @@ async function runWebClient(args: Args): Promise<void> {
   });
 
   try {
-    await spawnPromise("node", [inspectorClientPath], {
+    // Pass command and args to client startup script
+    const clientArgs = [];
+
+    // Add -e flags for each environment variable
+    for (const [key, value] of Object.entries(args.envArgs)) {
+      clientArgs.push("-e", `${key}=${value}`);
+    }
+
+    // Then add command and args
+    if (args.command) {
+      clientArgs.push(args.command);
+      clientArgs.push(...args.args);
+    }
+
+    await spawnPromise("node", [inspectorClientPath, ...clientArgs], {
+      env: {
+        ...process.env,
+        ...args.envArgs, // Keep process env passing for safety
+      },
       signal: abort.signal,
       echoOutput: true,
     });
