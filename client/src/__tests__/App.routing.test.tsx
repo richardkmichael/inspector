@@ -1,85 +1,12 @@
 import { render, waitFor } from "@testing-library/react";
+import {
+  mockLocation,
+  mockHistory,
+  defaultConnectionState,
+  connectedConnectionState,
+} from "./helpers/app-mocks";
 import App from "../App";
 import { useConnection } from "../lib/hooks/useConnection";
-
-// Mock auth dependencies first
-jest.mock("@modelcontextprotocol/sdk/client/auth.js", () => ({
-  auth: jest.fn(),
-}));
-
-jest.mock("../lib/oauth-state-machine", () => ({
-  OAuthStateMachine: jest.fn(),
-}));
-
-jest.mock("../lib/auth", () => ({
-  InspectorOAuthClientProvider: jest.fn().mockImplementation(() => ({
-    tokens: jest.fn().mockResolvedValue(null),
-    clear: jest.fn(),
-  })),
-  DebugInspectorOAuthClientProvider: jest.fn(),
-}));
-
-// Mock the config utils
-jest.mock("../utils/configUtils", () => ({
-  ...jest.requireActual("../utils/configUtils"),
-  getMCPProxyAddress: jest.fn(() => "http://localhost:6277"),
-  getMCPProxyAuthToken: jest.fn(() => ({
-    token: "",
-    header: "X-MCP-Proxy-Auth",
-  })),
-  getInitialTransportType: jest.fn(() => "stdio"),
-  getInitialSseUrl: jest.fn(() => "http://localhost:3001/sse"),
-  getInitialCommand: jest.fn(() => "mcp-server-everything"),
-  getInitialArgs: jest.fn(() => ""),
-  initializeInspectorConfig: jest.fn(() => ({})),
-  saveInspectorConfig: jest.fn(),
-}));
-
-// Mock other dependencies
-jest.mock("../lib/hooks/useConnection", () => ({
-  useConnection: jest.fn(() => ({
-    connectionStatus: "connected",
-    serverCapabilities: { resources: true },
-    mcpClient: {},
-    requestHistory: [],
-    makeRequest: jest.fn(),
-    sendNotification: jest.fn(),
-    handleCompletion: jest.fn(),
-    completionsSupported: false,
-    connect: jest.fn(),
-    disconnect: jest.fn(),
-  })),
-}));
-jest.mock("../lib/hooks/useDraggablePane", () => ({
-  useDraggablePane: () => ({
-    height: 300,
-    handleDragStart: jest.fn(),
-  }),
-  useDraggableSidebar: () => ({
-    width: 320,
-    isDragging: false,
-    handleDragStart: jest.fn(),
-  }),
-}));
-
-jest.mock("../components/Sidebar", () => ({
-  __esModule: true,
-  default: () => <div>Sidebar</div>,
-}));
-
-global.fetch = jest.fn().mockResolvedValue({ json: () => Promise.resolve({}) });
-
-// Mock window.location and window.history
-const mockLocation = { hash: "", pathname: "/", search: "" };
-const mockHistory = { replaceState: jest.fn() };
-Object.defineProperty(window, "location", {
-  value: mockLocation,
-  writable: true,
-});
-Object.defineProperty(window, "history", {
-  value: mockHistory,
-  writable: true,
-});
 
 describe("App - URL Fragment Routing", () => {
   const mockUseConnection = jest.mocked(useConnection);
@@ -87,9 +14,16 @@ describe("App - URL Fragment Routing", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockLocation.hash = "";
+    // Override default to connected state for routing tests
+    mockUseConnection.mockReturnValue({
+      ...connectedConnectionState,
+      serverCapabilities: { resources: { listChanged: true, subscribe: true } },
+    });
   });
 
   test("sets default hash based on server capabilities priority", async () => {
+    // Tab priority follows UI order: Resources | Prompts | Tools | Ping | Sampling | Roots | Auth
+    // Server capabilities determine the first 3 tabs; if none are present, falls back to Ping
     const testCases = [
       {
         capabilities: { resources: { listChanged: true, subscribe: true } },
@@ -109,7 +43,7 @@ describe("App - URL Fragment Routing", () => {
     for (const { capabilities, expected } of testCases) {
       mockLocation.hash = "";
       mockUseConnection.mockImplementationOnce(() => ({
-        ...mockUseConnection(),
+        ...connectedConnectionState,
         serverCapabilities: capabilities,
       }));
 
@@ -124,7 +58,7 @@ describe("App - URL Fragment Routing", () => {
   test("does not set hash when disconnected", async () => {
     mockLocation.hash = "";
     mockUseConnection.mockImplementationOnce(() => ({
-      ...mockUseConnection(),
+      ...defaultConnectionState,
       connectionStatus: "disconnected",
       serverCapabilities: null,
       mcpClient: null,
@@ -150,7 +84,7 @@ describe("App - URL Fragment Routing", () => {
 
     // Now disconnect
     mockUseConnection.mockImplementationOnce(() => ({
-      ...mockUseConnection(),
+      ...defaultConnectionState,
       connectionStatus: "disconnected",
       serverCapabilities: null,
       mcpClient: null,
