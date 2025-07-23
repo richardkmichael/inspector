@@ -2,7 +2,7 @@ import { render, waitFor } from "@testing-library/react";
 import {
   mockLocation,
   mockHistory,
-  defaultConnectionState,
+  disconnectedConnectionState,
   connectedConnectionState,
 } from "./helpers/app-mocks";
 import App from "../App";
@@ -14,7 +14,7 @@ describe("App - URL Fragment Routing", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockLocation.hash = "";
-    // Override default to connected state for routing tests
+    // Override default to connected state, with capabilities for routing tests
     mockUseConnection.mockReturnValue({
       ...connectedConnectionState,
       serverCapabilities: { resources: { listChanged: true, subscribe: true } },
@@ -57,12 +57,7 @@ describe("App - URL Fragment Routing", () => {
 
   test("does not set hash when disconnected", async () => {
     mockLocation.hash = "";
-    mockUseConnection.mockImplementationOnce(() => ({
-      ...defaultConnectionState,
-      connectionStatus: "disconnected",
-      serverCapabilities: null,
-      mcpClient: null,
-    }));
+    mockUseConnection.mockImplementationOnce(() => disconnectedConnectionState)
 
     render(<App />);
 
@@ -83,12 +78,7 @@ describe("App - URL Fragment Routing", () => {
     });
 
     // Now disconnect
-    mockUseConnection.mockImplementationOnce(() => ({
-      ...defaultConnectionState,
-      connectionStatus: "disconnected",
-      serverCapabilities: null,
-      mcpClient: null,
-    }));
+    mockUseConnection.mockImplementationOnce(() => disconnectedConnectionState)
     rerender(<App />);
 
     // Should clear the hash

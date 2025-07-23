@@ -34,8 +34,8 @@ jest.mock("../../utils/configUtils", () => ({
   saveInspectorConfig: jest.fn(),
 }));
 
-// Default connection state (can be overridden in tests)
-export const defaultConnectionState = {
+// Default connection state is disconnected
+export const disconnectedConnectionState = {
   connectionStatus: "disconnected" as const,
   serverCapabilities: null,
   mcpClient: null,
@@ -49,17 +49,17 @@ export const defaultConnectionState = {
 };
 
 // Connected state for tests that need an active connection
-// Uses empty server capabilities by default, which causes the app to fall back to the "ping" tab
+// Empty server capabilities, which causes the app to fall back to the "Ping" tab
 export const connectedConnectionState = {
-  ...defaultConnectionState,
+  ...disconnectedConnectionState,
   connectionStatus: "connected" as const,
-  serverCapabilities: {}, // Empty server capabilities - falls back to ping tab per UI tab order
+  serverCapabilities: {},
   mcpClient: {} as object,
 };
 
 // Mock other dependencies
 jest.mock("../../lib/hooks/useConnection", () => ({
-  useConnection: jest.fn(() => defaultConnectionState),
+  useConnection: jest.fn(() => disconnectedConnectionState),
 }));
 
 jest.mock("../../lib/hooks/useDraggablePane", () => ({
