@@ -10,6 +10,9 @@ export default defineConfig({
     command: "npm run dev",
     url: "http://localhost:6274",
     reuseExistingServer: !process.env.CI,
+    env: {
+      MCP_AUTO_OPEN_ENABLED: "false",
+    },
   },
 
   testDir: "./e2e",
