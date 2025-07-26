@@ -584,7 +584,8 @@ describe("DynamicJsonForm Complex Fields", () => {
 });
 
 describe("DynamicJsonForm Copy JSON Functionality", () => {
-  const mockWriteText = jest.fn(() => Promise.resolve());
+  const mockWriteText = jest.fn<(text: string) => Promise<void>>();
+  mockWriteText.mockResolvedValue(undefined);
 
   beforeEach(() => {
     jest.clearAllMocks();
