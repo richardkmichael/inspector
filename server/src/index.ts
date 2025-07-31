@@ -29,10 +29,15 @@ const STREAMABLE_HTTP_HEADERS_PASSTHROUGH = [
   "last-event-id",
 ];
 
-const defaultEnvironment = {
+// Combine environment variables and sort alphabetically
+const combinedEnvironment = {
   ...getDefaultEnvironment(),
   ...(process.env.MCP_ENV_VARS ? JSON.parse(process.env.MCP_ENV_VARS) : {}),
 };
+
+const defaultEnvironment = Object.entries(combinedEnvironment)
+  .sort(([a], [b]) => a.localeCompare(b))
+  .reduce((acc, [k, v]) => ({ ...acc, [k]: v }), {});
 
 const { values } = parseArgs({
   args: process.argv.slice(2),
