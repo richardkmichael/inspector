@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 // Adjust the URL if your dev server runs on a different port
-const APP_URL = "http://localhost:6274/";
+const APP_URL = "http://localhost:6274/?MCP_PROXY_AUTH_TOKEN=abc123";
 
 test.describe("CLI npx (npm exec) start up", { tag: "@cli" }, () => {
   test("CLI arguments should populate form fields", async ({ page }) => {
