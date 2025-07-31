@@ -445,6 +445,33 @@ describe("Sidebar Environment Variables", () => {
     });
   });
 
+  describe("Environment Variable Display Order", () => {
+    it("should display environment variables in sorted order", () => {
+      // Environment variables arrive sorted from server
+      const initialEnv = {
+        ALPHA: "alpha_value",
+        BETA: "beta_value",
+        GAMMA: "gamma_value",
+        ZEBRA: "zebra_value",
+      };
+      renderSidebar({ env: initialEnv });
+
+      openEnvVarsSection();
+
+      // Get all key inputs in the order they appear in the DOM
+      const keyInputs = screen.getAllByRole("textbox").filter((input) => {
+        const value = (input as HTMLInputElement).value;
+        return ["ZEBRA", "ALPHA", "BETA", "GAMMA"].includes(value);
+      });
+
+      // Verify they are displayed in alphabetical order
+      const displayedKeys = keyInputs.map(
+        (input) => (input as HTMLInputElement).value,
+      );
+      expect(displayedKeys).toEqual(["ALPHA", "BETA", "GAMMA", "ZEBRA"]);
+    });
+  });
+
   describe("Edge Cases", () => {
     it("should handle empty key", () => {
       const setEnv = jest.fn();
