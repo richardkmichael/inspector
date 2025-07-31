@@ -7,9 +7,9 @@ const getWebServerCommand = () => {
    */
   switch (process.env.CLI_TEST_SCENARIO) {
     case "inline":
-      return "npx . -e FOO=bar -e BAZ=bat uv run main.py";
+      return "npx . -e FOO=bar -e BAZ=bat npm --silent --prefix /path/to/mcp/servers/src/everything run start";
     case "file":
-      return "npx . --config client/e2e/fixtures/test-cli-config.json --server test-server";
+      return "npx . --config client/e2e/fixtures/everything-server.json --server everything";
     /* FIXME: With and without a mock localStorage
      * case "none":
      *   return "npx . ";
