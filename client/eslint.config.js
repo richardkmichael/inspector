@@ -23,6 +23,14 @@ export default tseslint.config(
         "warn",
         { allowConstantExport: true },
       ],
+      // Custom rule to enforce JSON import assertions
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector: "ImportDeclaration[source.value=/\\.json$/]:not([attributes.length>0])",
+          message: "JSON imports must use import assertion: import foo from './file.json' with { type: 'json' }",
+        },
+      ],
     },
   },
 );
