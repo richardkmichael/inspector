@@ -77,8 +77,9 @@ async function startProdServer(serverOptions) {
     envVars,
     abort,
     command,
-    mcpServerArgs,
+    mcpServerArgs: commandArgs,
   } = serverOptions;
+
   const inspectorServerPath = resolve(
     __dirname,
     "../..",
@@ -87,15 +88,15 @@ async function startProdServer(serverOptions) {
     "index.js",
   );
 
+  const mcpServerCommand = command ? [`--command=${command}`] : [];
+  const mcpServerArgs =
+    commandArgs && commandArgs.length > 0
+      ? [`--args=${commandArgs.join(" ")}`]
+      : [];
+
   const server = spawnPromise(
     "node",
-    [
-      inspectorServerPath,
-      command ? `--command=${command}` : "",
-      mcpServerArgs && mcpServerArgs.length > 0
-        ? `--args=${mcpServerArgs.join(" ")}`
-        : "",
-    ],
+    [inspectorServerPath, ...mcpServerCommand, ...mcpServerArgs],
     {
       env: {
         ...process.env,
@@ -124,6 +125,7 @@ async function startDevClient(clientOptions) {
     abort,
     cancelled,
   } = clientOptions;
+
   const clientCommand = "npx";
   const host = process.env.HOST || "localhost";
   const clientArgs = ["vite", "--port", CLIENT_PORT, "--host", host];
