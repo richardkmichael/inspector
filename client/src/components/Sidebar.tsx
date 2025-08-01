@@ -125,10 +125,21 @@ const Sidebar = ({
   // Shared utility function to generate server config
   const generateServerConfig = useCallback(() => {
     if (transportType === "stdio") {
+      // Filter out environment variables with empty keys or values
+      const filteredEnv = Object.entries(env)
+        .filter(([key, value]) => key.trim() !== "" && value.trim() !== "")
+        .reduce(
+          (acc, [key, value]) => {
+            acc[key] = value;
+            return acc;
+          },
+          {} as Record<string, string>,
+        );
+
       return {
         command,
         args: args.trim() ? args.split(/\s+/) : [],
-        env: { ...env },
+        env: filteredEnv,
       };
     }
     if (transportType === "sse") {

@@ -904,5 +904,46 @@ describe("Sidebar Environment Variables", () => {
       );
       expect(mockClipboardWrite).toHaveBeenCalledWith(expectedConfig);
     });
+
+    it("should filter out empty environment variables when copying configuration", async () => {
+      const command = "node";
+      const args = "server.js";
+      const env = {
+        API_KEY: "test-key",
+        "": "empty-key-value", // Empty key
+        DEBUG: "", // Empty value
+        VALID_VAR: "valid-value",
+        "   ": "whitespace-key", // Whitespace-only key
+        PORT: "   ", // Whitespace-only value
+      };
+
+      renderSidebar({
+        transportType: "stdio",
+        command,
+        args,
+        env,
+      });
+
+      await act(async () => {
+        const { serverEntry } = getCopyButtons();
+        fireEvent.click(serverEntry);
+        jest.runAllTimers();
+      });
+
+      expect(mockClipboardWrite).toHaveBeenCalledTimes(1);
+      const expectedConfig = JSON.stringify(
+        {
+          command,
+          args: ["server.js"],
+          env: {
+            API_KEY: "test-key",
+            VALID_VAR: "valid-value",
+          },
+        },
+        null,
+        4,
+      );
+      expect(mockClipboardWrite).toHaveBeenCalledWith(expectedConfig);
+    });
   });
 });
