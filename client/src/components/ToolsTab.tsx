@@ -234,7 +234,18 @@ const ToolsTab = ({
                   onClick={async () => {
                     try {
                       setIsToolRunning(true);
-                      await callTool(selectedTool.name, params);
+                      // Filter out empty string values for required fields to properly handle cleared inputs
+                      const filteredParams = Object.fromEntries(
+                        Object.entries(params).filter(([, value]) => {
+                          // Keep non-string values as-is
+                          if (typeof value !== 'string') return true;
+                          // Keep non-empty strings
+                          if (value !== '') return true;
+                          // Remove empty strings (they should be treated as undefined/missing)
+                          return false;
+                        })
+                      );
+                      await callTool(selectedTool.name, filteredParams);
                     } finally {
                       setIsToolRunning(false);
                     }
