@@ -1,5 +1,6 @@
 import { Transport } from "@modelcontextprotocol/sdk/shared/transport.js";
 import { isJSONRPCRequest } from "@modelcontextprotocol/sdk/types.js";
+import { DebugLogger } from "./debug-logger.js";
 
 function onClientError(error: Error) {
   console.error("Error from inspector client:", error);
@@ -29,8 +30,23 @@ export default function mcpProxy({
 
   let reportedServerSession = false;
 
+  // Initialize debug logging if environment variable is set
+  let debugLogger: DebugLogger | null = null;
+  const debugBasePath = process.env.MCP_TRANSPORT_DEBUG_FILE;
+  if (debugBasePath) {
+    debugLogger = new DebugLogger(debugBasePath);
+    debugLogger.initialize().catch((error) => {
+      console.error("[mcpProxy] Failed to initialize debug logger:", error);
+    });
+  }
+
   transportToClient.onmessage = (message) => {
+    // Log message from client to server
+    debugLogger?.logMessage("client->server", message);
+
     transportToServer.send(message).catch((error) => {
+      debugLogger?.logError(error);
+
       // Send error response back to client if it was a request (has id) and connection is still open
       if (isJSONRPCRequest(message) && !transportToClientClosed) {
         const errorResponse = {
@@ -57,6 +73,10 @@ export default function mcpProxy({
       }
       reportedServerSession = true;
     }
+
+    // Log message from server to client
+    debugLogger?.logMessage("server->client", message);
+
     transportToClient.send(message).catch(onClientError);
   };
 
@@ -66,6 +86,7 @@ export default function mcpProxy({
     }
 
     transportToClientClosed = true;
+    debugLogger?.logClose();
     transportToServer.close().catch(onServerError);
   };
 
@@ -74,9 +95,17 @@ export default function mcpProxy({
       return;
     }
     transportToServerClosed = true;
+    debugLogger?.logClose();
     transportToClient.close().catch(onClientError);
   };
 
-  transportToClient.onerror = onClientError;
-  transportToServer.onerror = onServerError;
+  transportToClient.onerror = (error) => {
+    debugLogger?.logError(error);
+    onClientError(error);
+  };
+
+  transportToServer.onerror = (error) => {
+    debugLogger?.logError(error);
+    onServerError(error);
+  };
 }
