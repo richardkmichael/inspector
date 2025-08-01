@@ -37,7 +37,6 @@ const defaultEnvironment = {
 const { values } = parseArgs({
   args: process.argv.slice(2),
   options: {
-    env: { type: "string", default: "" },
     args: { type: "string", default: "" },
     command: { type: "string", default: "" },
   },
