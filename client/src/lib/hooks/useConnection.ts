@@ -35,7 +35,7 @@ import { RequestOptions } from "@modelcontextprotocol/sdk/shared/protocol.js";
 import { useEffect, useState } from "react";
 import { useToast } from "@/lib/hooks/useToast";
 import { z } from "zod";
-import { ConnectionStatus } from "../constants";
+import { ConnectionStatus, CLIENT_IDENTITY } from "../constants";
 import { Notification, StdErrNotificationSchema } from "../notificationTypes";
 import { auth } from "@modelcontextprotocol/sdk/client/auth.js";
 import {
@@ -43,7 +43,6 @@ import {
   InspectorOAuthClientProvider,
   saveClientInformationToSessionStorage,
 } from "../auth";
-import packageJson from "../../../package.json";
 import {
   getMCPProxyAddress,
   getMCPServerRequestMaxTotalTimeout,
@@ -328,10 +327,6 @@ export function useConnection({
   };
 
   const connect = async (_e?: unknown, retryCount: number = 0) => {
-    const [, name = packageJson.name] = packageJson.name.split("/");
-    const version = packageJson.version;
-    const clientIdentity = { name, version };
-
     const clientCapabilities = {
       capabilities: {
         sampling: {},
@@ -343,7 +338,7 @@ export function useConnection({
     };
 
     const client = new Client<Request, Notification, Result>(
-      clientIdentity,
+      CLIENT_IDENTITY,
       clientCapabilities,
     );
 
