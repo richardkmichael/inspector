@@ -222,7 +222,7 @@ describe("useConnection", () => {
 
       expect(Client).toHaveBeenCalledWith(
         expect.objectContaining({
-          name: "mcp-inspector",
+          name: "inspector-client",
           version: expect.any(String),
         }),
         expect.objectContaining({
