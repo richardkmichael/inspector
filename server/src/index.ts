@@ -391,7 +391,11 @@ app.get(
         throw error;
       }
 
-      const webAppTransport = new SSEServerTransport("/message", res);
+      const proxyFullAddress = (req.query.proxyFullAddress as string) || "";
+      const prefix = proxyFullAddress || "";
+      const endpoint = `${prefix}/message`;
+
+      const webAppTransport = new SSEServerTransport(endpoint, res);
       console.log("Created client transport");
 
       webAppTransports.set(webAppTransport.sessionId, webAppTransport);
@@ -469,7 +473,11 @@ app.get(
       }
 
       if (serverTransport) {
-        const webAppTransport = new SSEServerTransport("/message", res);
+        const proxyFullAddress = (req.query.proxyFullAddress as string) || "";
+        const prefix = proxyFullAddress || "";
+        const endpoint = `${prefix}/message`;
+
+        const webAppTransport = new SSEServerTransport(endpoint, res);
         webAppTransports.set(webAppTransport.sessionId, webAppTransport);
         console.log("Created client transport");
         serverTransports.set(webAppTransport.sessionId, serverTransport!);
