@@ -378,7 +378,6 @@ app.get(
       let serverTransport: Transport | undefined;
       try {
         serverTransport = await createTransport(req);
-        console.log("Created server transport");
       } catch (error) {
         if (error instanceof SseError && error.code === 401) {
           console.error(
@@ -396,10 +395,11 @@ app.get(
       const endpoint = `${prefix}/message`;
 
       const webAppTransport = new SSEServerTransport(endpoint, res);
+      webAppTransports.set(webAppTransport.sessionId, webAppTransport);
       console.log("Created client transport");
 
-      webAppTransports.set(webAppTransport.sessionId, webAppTransport);
       serverTransports.set(webAppTransport.sessionId, serverTransport);
+      console.log("Created server transport");
 
       await webAppTransport.start();
 
@@ -446,7 +446,7 @@ app.get(
   async (req, res) => {
     try {
       console.log(
-        "New SSE connection request. NOTE: The sse transport is deprecated and has been replaced by StreamableHttp",
+        "New SSE connection request. NOTE: The SSE transport is deprecated and has been replaced by StreamableHttp",
       );
       let serverTransport: Transport | undefined;
       try {
@@ -480,6 +480,7 @@ app.get(
         const webAppTransport = new SSEServerTransport(endpoint, res);
         webAppTransports.set(webAppTransport.sessionId, webAppTransport);
         console.log("Created client transport");
+
         serverTransports.set(webAppTransport.sessionId, serverTransport!);
         console.log("Created server transport");
 
