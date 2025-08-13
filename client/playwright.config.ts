@@ -41,7 +41,11 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
-  /* Reporter to use. See https://playwright.dev/docs/test-reporters */
+
+  /* Reporter to use. See https://playwright.dev/docs/test-reporters
+   *   Use `--reporter [type]` to override for more information while debugging tests.
+   *   e.g., `npx playwright test --reporter list [args]`
+   */
   reporter: process.env.CI
     ? [
         ["html", { outputFolder: "playwright-report" }],
@@ -49,6 +53,7 @@ export default defineConfig({
         ["line"],
       ]
     : [["line"]],
+
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
