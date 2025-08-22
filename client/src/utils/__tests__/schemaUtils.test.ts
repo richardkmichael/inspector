@@ -405,6 +405,10 @@ describe("Output Schema Validation", () => {
     });
 
     test("handles invalid output schemas gracefully", () => {
+      const consoleWarn = jest
+        .spyOn(console, "warn")
+        .mockImplementation(() => {});
+
       const toolsWithInvalidSchema: Tool[] = [
         {
           name: "invalidSchemaTool",
@@ -422,6 +426,14 @@ describe("Output Schema Validation", () => {
         cacheToolOutputSchemas(toolsWithInvalidSchema),
       ).not.toThrow();
       expect(hasOutputSchema("invalidSchemaTool")).toBe(false);
+
+      expect(consoleWarn).toHaveBeenCalledTimes(1);
+      expect(consoleWarn).toHaveBeenCalledWith(
+        "Failed to compile output schema for tool invalidSchemaTool:",
+        expect.any(Error),
+      );
+
+      consoleWarn.mockRestore();
     });
   });
 

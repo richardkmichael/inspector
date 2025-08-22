@@ -741,10 +741,17 @@ describe("useConnection", () => {
   });
 
   describe("OAuth Error Handling with Scope Discovery", () => {
+    let consoleError: jest.SpyInstance;
+
     beforeEach(() => {
       jest.clearAllMocks();
       mockAuth.mockResolvedValue("AUTHORIZED");
       mockDiscoverScopes.mockResolvedValue(undefined);
+      consoleError = jest.spyOn(console, "error").mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+      consoleError.mockRestore();
     });
 
     const setup401Error = () => {
@@ -855,6 +862,12 @@ describe("useConnection", () => {
           serverUrl: defaultProps.sseUrl,
           scope: expectedAuthScope,
         });
+
+        expect(consoleError).toHaveBeenCalledTimes(1);
+        expect(consoleError).toHaveBeenCalledWith(
+          expect.stringContaining("Failed to connect to MCP Server"),
+          expect.any(Object),
+        );
       },
     );
 
@@ -875,6 +888,12 @@ describe("useConnection", () => {
         serverUrl: defaultProps.sseUrl,
         scope: undefined,
       });
+
+      expect(consoleError).toHaveBeenCalledTimes(1);
+      expect(consoleError).toHaveBeenCalledWith(
+        expect.stringContaining("Failed to connect to MCP Server"),
+        expect.any(Object),
+      );
     });
   });
 });

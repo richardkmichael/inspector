@@ -20,8 +20,15 @@ const baseMetadata = {
 };
 
 describe("discoverScopes", () => {
+  let consoleDebug: jest.SpyInstance;
+
   beforeEach(() => {
     jest.clearAllMocks();
+    consoleDebug = jest.spyOn(console, "debug").mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    consoleDebug.mockRestore();
   });
 
   const testCases = [
@@ -150,6 +157,14 @@ describe("discoverScopes", () => {
       const result = await discoverScopes(serverUrl, resourceMetadata);
 
       expect(result).toBeUndefined();
+
+      if (mockRejects) {
+        expect(consoleDebug).toHaveBeenCalledTimes(1);
+        expect(consoleDebug).toHaveBeenCalledWith(
+          "OAuth scope discovery failed:",
+          mockRejects,
+        );
+      }
     },
   );
 });
