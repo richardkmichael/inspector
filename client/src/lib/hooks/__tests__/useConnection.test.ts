@@ -234,6 +234,28 @@ describe("useConnection", () => {
       jest.clearAllMocks();
     });
 
+    const findElicitRequestHandler = () => {
+      return mockClient.setRequestHandler.mock.calls.find((call) => {
+        try {
+          const schema = call[0];
+          const testRequest = {
+            method: "elicitation/create",
+            params: {
+              message: "test message",
+              requestedSchema: {
+                type: "object",
+                properties: { name: { type: "string" } },
+              },
+            },
+          };
+          const parseResult = schema.safeParse && schema.safeParse(testRequest);
+          return parseResult?.success;
+        } catch {
+          return false;
+        }
+      });
+    };
+
     test("declares elicitation capability during client initialization", async () => {
       const Client = jest.requireMock(
         "@modelcontextprotocol/sdk/client/index.js",
@@ -271,29 +293,7 @@ describe("useConnection", () => {
         await result.current.connect();
       });
 
-      const elicitRequestHandlerCall =
-        mockClient.setRequestHandler.mock.calls.find((call) => {
-          try {
-            const schema = call[0];
-            const testRequest = {
-              method: "elicitation/create",
-              params: {
-                message: "test message",
-                requestedSchema: {
-                  type: "object",
-                  properties: {
-                    name: { type: "string" },
-                  },
-                },
-              },
-            };
-            const parseResult =
-              schema.safeParse && schema.safeParse(testRequest);
-            return parseResult?.success;
-          } catch {
-            return false;
-          }
-        });
+      const elicitRequestHandlerCall = findElicitRequestHandler();
 
       expect(elicitRequestHandlerCall).toBeDefined();
       expect(mockClient.setRequestHandler).toHaveBeenCalledWith(
@@ -309,29 +309,7 @@ describe("useConnection", () => {
         await result.current.connect();
       });
 
-      const elicitRequestHandlerCall =
-        mockClient.setRequestHandler.mock.calls.find((call) => {
-          try {
-            const schema = call[0];
-            const testRequest = {
-              method: "elicitation/create",
-              params: {
-                message: "test message",
-                requestedSchema: {
-                  type: "object",
-                  properties: {
-                    name: { type: "string" },
-                  },
-                },
-              },
-            };
-            const parseResult =
-              schema.safeParse && schema.safeParse(testRequest);
-            return parseResult?.success;
-          } catch {
-            return false;
-          }
-        });
+      const elicitRequestHandlerCall = findElicitRequestHandler();
 
       expect(elicitRequestHandlerCall).toBeUndefined();
     });
@@ -349,29 +327,7 @@ describe("useConnection", () => {
         await result.current.connect();
       });
 
-      const elicitRequestHandlerCall =
-        mockClient.setRequestHandler.mock.calls.find((call) => {
-          try {
-            const schema = call[0];
-            const testRequest = {
-              method: "elicitation/create",
-              params: {
-                message: "test message",
-                requestedSchema: {
-                  type: "object",
-                  properties: {
-                    name: { type: "string" },
-                  },
-                },
-              },
-            };
-            const parseResult =
-              schema.safeParse && schema.safeParse(testRequest);
-            return parseResult?.success;
-          } catch {
-            return false;
-          }
-        });
+      const elicitRequestHandlerCall = findElicitRequestHandler();
 
       expect(elicitRequestHandlerCall).toBeDefined();
       const [, handler] = elicitRequestHandlerCall;
@@ -417,29 +373,7 @@ describe("useConnection", () => {
         await result.current.connect();
       });
 
-      const elicitRequestHandlerCall =
-        mockClient.setRequestHandler.mock.calls.find((call) => {
-          try {
-            const schema = call[0];
-            const testRequest = {
-              method: "elicitation/create",
-              params: {
-                message: "test message",
-                requestedSchema: {
-                  type: "object",
-                  properties: {
-                    name: { type: "string" },
-                  },
-                },
-              },
-            };
-            const parseResult =
-              schema.safeParse && schema.safeParse(testRequest);
-            return parseResult?.success;
-          } catch {
-            return false;
-          }
-        });
+      const elicitRequestHandlerCall = findElicitRequestHandler();
 
       const [, handler] = elicitRequestHandlerCall;
 
