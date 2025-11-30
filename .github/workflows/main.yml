@@ -14,9 +14,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Check formatting
-        run: npx prettier --check .
-
       - uses: actions/setup-node@v4
         with:
           node-version-file: package.json
@@ -27,8 +24,7 @@ jobs:
       - name: Check version consistency
         run: npm run check-version
 
-      - name: Check linting
-        working-directory: ./client
+      - name: Check formatting and linting
         run: npm run lint
 
       - name: Run client tests
