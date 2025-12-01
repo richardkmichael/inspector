@@ -1,9 +1,5 @@
 on:
   push:
-    branches:
-      - main
-
-  pull_request:
 
 jobs:
   build:
@@ -14,8 +10,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 18
-          cache: npm
+          node-version: '18.20.5'
+          cache: ''
 
       - run: npm ci
-      - run: npm run build
