@@ -4,6 +4,7 @@ on:
       - main
 
   pull_request:
+
   release:
     types: [published]
 
@@ -45,6 +46,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version-file: package.json
@@ -63,11 +65,13 @@ jobs:
     if: github.event_name == 'release'
     environment: release
     needs: build
+
     permissions:
       contents: read
       packages: write
       attestations: write
       id-token: write
+
     steps:
       - uses: actions/checkout@v4
 
