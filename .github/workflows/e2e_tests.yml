@@ -2,9 +2,11 @@ name: Playwright Tests
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   pull_request:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
   test:
@@ -67,11 +69,10 @@ jobs:
         with:
           create-comment: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
           report-file: client/results.json
-          comment-title: "🎭 Playwright E2E Test Results"
-          job-summary: true
-          icon-style: "emojis"
+          comment-title: "Playwright test results"
           custom-info: |
-            **Test Environment:** Ubuntu Latest, Node.js ${{ steps.setup_node.outputs.node-version }}
+
+            **Environment:** Ubuntu Latest, Node.js ${{ steps.setup_node.outputs.node-version }}
             **Browsers:** Chromium, Firefox
 
             📊 [View Detailed HTML Report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) (download artifacts)
