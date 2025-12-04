@@ -1,0 +1,36 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+
+  workflow_call:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: package.json
+          cache: npm
+
+      - run: npm clean-install
+
+      - name: Check version consistency
+        run: npm run check-version
+
+      - name: Check formatting and linting
+        run: npm run lint
+
+      - name: Run client tests
+        working-directory: ./client
+        run: npm test
+
+      - run: npm run build
