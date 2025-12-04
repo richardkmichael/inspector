@@ -1,44 +1,15 @@
-name: Build and release
+name: Release
 
 on:
-  push:
-    branches:
-      - main
-
-  pull_request:
-
   release:
     types: [published]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: package.json
-          cache: npm
-
-      - run: npm clean-install
-
-      - name: Check version consistency
-        run: npm run check-version
-
-      - name: Check formatting and linting
-        run: npm run lint
-
-      - name: Run client tests
-        working-directory: ./client
-        run: npm test
-
-      - run: npm run build
+    uses: ./.github/workflows/build.yml
 
   publish:
     runs-on: ubuntu-latest
-    if: github.event_name == 'release'
     environment: release
     needs: build
 
@@ -64,7 +35,6 @@ jobs:
 
   publish-github-container-registry:
     runs-on: ubuntu-latest
-    if: github.event_name == 'release'
     environment: release
     needs: build
 
