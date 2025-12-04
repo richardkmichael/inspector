@@ -2,6 +2,7 @@ name: Release
 
 on:
   release:
+    # `published` triggers for both `released` and `prereleased`, even from a saved draft
     types: [published]
 
 jobs:
