@@ -35,3 +35,35 @@ jobs:
         run: npm test
 
       - run: npm run build
+
+  #  When users `npm install` the Inspector, npm will try to flatten/deduplicate dependencies across
+  #  their entire project, and could choose newer versions than our lock file (within our semver
+  #  constraints). This test helps catch when those newer versions break the build.
+  dependency-range-test:
+    runs-on: ubuntu-latest
+
+    # Don't block if this fails - it's informational
+    continue-on-error: true
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: package.json
+          # Omit cache to test with freshly-resolved dependencies
+
+      - name: Install dependencies with fresh resolution
+        run: npm install --no-package-lock
+
+      - name: Check version consistency
+        run: npm run check-version
+
+      - name: Check formatting and linting
+        run: npm run lint
+
+      - name: Run client tests
+        working-directory: ./client
+        run: npm test
+
+      - run: npm run build
