@@ -21,6 +21,8 @@ jobs:
           node-version-file: package.json
           cache: npm
 
+      - run: node scripts/validate-platform-dependencies.js
+
       - run: npm clean-install
 
       - name: Check version consistency
