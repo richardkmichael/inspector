@@ -20,6 +20,13 @@ jobs:
         node-version: [20, 22, 24]
 
     steps:
+      # Prevent LF→CRLF conversion on Windows checkout (causes prettier to warn).
+      # Linux and macOS are false by default.  TODO: gitattributes
+      - name: Set git to use LF
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
